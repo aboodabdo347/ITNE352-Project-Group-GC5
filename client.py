@@ -10,7 +10,7 @@ def main():
         s.connect((HOST, PORT))
         s.sendall((username + "\n").encode())
 
-        print(s.recv(1024).decode())  # welcome
+        print(s.recv(1024).decode())
 
         while True:
             keyword = input("Keyword (or 'quit'): ")

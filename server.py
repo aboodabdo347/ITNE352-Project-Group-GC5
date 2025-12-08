@@ -16,14 +16,14 @@ def handle_client(conn, addr):
         if keyword.lower() == "quit":
             break
 
-        # fake headlines
+        # fake news just to test the connetion
         headlines = [
             {"title": f"{keyword} news 1"},
             {"title": f"{keyword} news 2"},
             {"title": f"{keyword} news 3"},
         ]
 
-        # save JSON for this client
+        # save it as json and send it to the client
         with open(f"{username}_demo.json", "w", encoding="utf-8") as f:
             json.dump(headlines, f, indent=2)
 
