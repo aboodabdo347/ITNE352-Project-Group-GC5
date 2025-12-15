@@ -4,6 +4,14 @@
 
 ---
 
+## 👥 Team Members
+
+| Student ID | Student Name                    | Group |
+| ---------: | ------------------------------- | :---: |
+|  202204625 | Abdulrahman Abdo Ahmed Shomaila |  GC5  |
+|  202208352 | Kadhim Abdulla Kadhim Alhaddar  |  GC5  |
+
+---
 ## Project Overview
 
 This project is a **client–server news system** built in Python.
