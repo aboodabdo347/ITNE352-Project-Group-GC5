@@ -28,7 +28,7 @@ This project is a **client–server news system** built in Python.
 | `server.py`                | Runs the server and handles client connections.                      |
 | `client.py`                | Connects to the server and interacts with the user.                  |
 | `*.json`                   | Generated automatically by the server to save each client’s results. |
-
+| `.gitignore` | Prevents sensitive files (like `.env` with API keys). |
 ---
 
 ## Requirements
