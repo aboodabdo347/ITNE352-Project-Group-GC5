@@ -53,9 +53,9 @@ if __name__ == "__main__":
         print("API_KEY not set; module imported without executing fetch.")
     else:
         fetcher = NewsDataFetcher(api_key)
-        params = {"country": list(VALID_COUNTRIES)[1], "pageSize": MAX_RESULTS}
+        params = {"country": list(VALID_COUNTRIES)[5], "pageSize": MAX_RESULTS}
         try:
             result = fetcher.get_headlines(params)
-            print((VALID_COUNTRIES)[1])
+            print(json.dumps(result, indent=2))
         except ConnectionError as e:
             print(f"Failed to fetch headlines: {e}")
