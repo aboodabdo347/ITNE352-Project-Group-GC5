@@ -1,3 +1,4 @@
+"""" Server Application Done By Abdulrahaman Abdo - GC5"""
 import json
 import requests
 import os # for accessing environment variables
@@ -45,3 +46,61 @@ class NewsDataFetcher:
             return api_response.json()
         except requests.RequestException as error:
             raise ConnectionError(f"API request failed: {error}")
+        
+class ParameterValidator:   # Validates client request parameters against allowed values
+
+    @staticmethod  # makes the function callable on the class without receiving a self parameter
+    def validate_headline_params(params): # Validate parameters for headline requests
+        validated = {}
+        if "q" in params:
+            keyword = params["q"].strip()
+            if not keyword:
+                return None, "Search keyword cannot be empty"
+            validated["q"] = keyword
+        
+        # Validate category
+        if "category" in params:
+            category = params["category"]
+            if category not in VALID_CATEGORIES:
+                return None, f"Invalid category. Choose from: {', '.join(sorted(VALID_CATEGORIES))}"
+            validated["category"] = category
+        
+        # Validate country code
+        if "country" in params:
+            country = params["country"]
+            if country not in VALID_COUNTRIES:
+                return None, f"Invalid country code. Choose from: {', '.join(sorted(VALID_COUNTRIES))}"
+            validated["country"] = country
+        
+        # Set default country for general queries
+        if not any(key in validated for key in ["country", "q", "category"]):
+            validated["country"] = "us"
+        
+        return validated, None
+    
+    @staticmethod
+    def validate_source_params(params): # Validate parameters for source requests
+        validated = {}
+        
+        # Validate category
+        if "category" in params:
+            category = params["category"]
+            if category not in VALID_CATEGORIES:
+                return None, f"Invalid category. Choose from: {', '.join(sorted(VALID_CATEGORIES))}"
+            validated["category"] = category
+        
+        # Validate country code
+        if "country" in params:
+            country = params["country"]
+            if country not in VALID_COUNTRIES:
+                return None, f"Invalid country code. Choose from: {', '.join(sorted(VALID_COUNTRIES))}"
+            validated["country"] = country
+        
+        # Validate language
+        if "language" in params:
+            language = params["language"]
+            if language not in VALID_LANGUAGES:
+                return None, f"Invalid language. Choose from: {', '.join(sorted(VALID_LANGUAGES))}"
+            validated["language"] = language
+        
+        return validated, None
