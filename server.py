@@ -32,12 +32,10 @@ class NewsDataFetcher:
         return self._execute_request(endpoint, query_params)
     
     def get_news_sources(self, query_params):
-        """Fetch news sources based on provided parameters"""
         endpoint = f"{self.base_url}sources"
         return self._execute_request(endpoint, query_params)
     
     def _execute_request(self, endpoint, query_params):
-        """Execute HTTP GET request to API endpoint"""
         request_params = dict(query_params)
         request_params["apiKey"] = self.api_key
         
