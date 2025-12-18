@@ -308,5 +308,51 @@ class ClientConnectionHandler(threading.Thread):
         self.socket.sendall(message.encode())
     
     def _log(self, message):
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S") 
         print(f"[{timestamp}] {message}")
+class NewsServerApplication:
+    # Main server application managing client connections 
+    
+    def __init__(self, host, port, api_key):
+        self.host = host
+        self.port = port
+        self.data_fetcher = NewsDataFetcher(api_key)
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    
+    def start(self):
+        # Start server and accept client connections 
+        self.server_socket.bind((self.host, self.port))
+        self.server_socket.listen(3)
+        
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[{timestamp}] Server started on {self.host}:{self.port}")
+        print(f"[{timestamp}] Waiting for client connections...")
+        
+        try:
+            while True:
+                client_sock, client_addr = self.server_socket.accept()
+                handler = ClientConnectionHandler(self, client_sock, client_addr)
+                handler.start()
+        except KeyboardInterrupt:
+            print("\n[Server] Shutting down...")
+        finally:
+            self.server_socket.close()
+
+
+def main():
+    # Application entry point 
+    # Load API key from environment
+    api_key = os.getenv("API_KEY")
+    
+    if not api_key:
+        print("Error: API_KEY not found in environment variables")
+        print("Please create a .env file with: API_KEY=your_api_key_here")
+        return
+    
+    server = NewsServerApplication(SERVER_HOST, SERVER_PORT, api_key)
+    server.start()
+
+
+if __name__ == "__main__":
+    main()
