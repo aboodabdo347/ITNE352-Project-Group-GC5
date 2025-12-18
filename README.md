@@ -248,14 +248,7 @@ The server receives **JSON messages** ended by a newline `\n` (it reads until `\
 
 ## client.py
 
-**Purpose:** Connects to server, sends username, shows menus, sends requests, displays lists (max 15), then requests details by index. 
-
-Expected output details:
-
-* Headlines list shows: source name, author, title
-* Headlines detail shows: source, author, title, URL, description, publish date/time
-* Sources list shows: source name
-* Sources detail shows: name, country, description, URL, category, language 
+> Not finished yet.
 
 ---
 
