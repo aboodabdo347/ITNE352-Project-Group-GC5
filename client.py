@@ -1,16 +1,17 @@
 import socket, json
 
-HOST = "127.0.0.1"
-PORT = 12345
-BUFFER_SIZE = 4096
+HOST = "127.0.0.1" # Localhost Server IP
+PORT = 12345 # Server Port
+BUFFER_SIZE = 4096 # Buffer size for receiving data
 
+# Send a request to the server
 def send_request(sock, action, params=None):
     if params is None:
         params = {}
     message = json.dumps({"action": action, "params": params}) + "\n"
     sock.sendall(message.encode())
 
-
+# Receive a response from the server
 def receive_response(sock):
     data = b""
     while b"\n" not in data:
@@ -21,7 +22,7 @@ def receive_response(sock):
     message, _ = data.split(b"\n", 1)
     return json.loads(message.decode())
 
-
+# Display the main menu and get user choice
 def show_main_menu():
     print("\n=== Main Menu ===")
     print("1. Search Headlines")
@@ -29,7 +30,7 @@ def show_main_menu():
     print("3. Quit")
     return input("Choose an option: ")
 
-
+# Display the headlines menu and get user choice
 def show_headlines_menu():
     print("\n--- Headlines Menu ---")
     print("1. Search by keyword")
@@ -39,7 +40,7 @@ def show_headlines_menu():
     print("5. Back")
     return input("Choose an option: ")
 
-
+# Display the sources menu and get user choice
 def show_sources_menu():
     print("\n--- Sources Menu ---")
     print("1. Search by category")
@@ -49,13 +50,13 @@ def show_sources_menu():
     print("5. Back")
     return input("Choose an option: ")
 
-
+# Display a list of items
 def display_list(items):
     for item in items:
         text = item.get("title") or item.get("name", "N/A")
         print(f"{item['index']}. {text}")
 
-
+# Show detailed information for a selected item
 def show_detail(sock, action):
     idx = input("Select index for details (Enter to skip): ").strip()
     if idx:
@@ -67,17 +68,17 @@ def show_detail(sock, action):
         else:
             print("Error:", detail.get("message", "Unknown error"))
 
-
+# Main function logic
 def main():
     username = input("Enter your name: ")
-
+    # Create tcp socket and connect to server
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect((HOST, PORT))
-        sock.sendall((username + "\n").encode())
+        sock.sendall((username + "\n").encode()) # Send username to server
 
         while True:
             choice = show_main_menu()
-
+            # HEADLINES MENU
             if choice == "1":
                 while True:
                     h_choice = show_headlines_menu()
@@ -111,7 +112,7 @@ def main():
 
                     display_list(response["items"])
                     show_detail(sock, "headlines_detail")
-
+            # SOURCES MENU
             elif choice == "2":
                 while True:
                     s_choice = show_sources_menu()
