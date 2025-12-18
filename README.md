@@ -248,7 +248,26 @@ The server receives **JSON messages** ended by a newline `\n` (it reads until `\
 
 ## client.py
 
+**Purpose:**  
 Implements the required menus, sends JSON requests to the server, displays list results, and fetches details by index.
+
+### Used packages
+
+* `socket`
+* `json`
+
+### Main functionality
+
+* Establishes a TCP connection with the server
+* Sends the client username to the server on connection
+* Displays three interactive menus:
+  * Main Menu
+  * Headlines Menu
+  * Sources Menu
+* Sends user requests to the server using JSON messages
+* Receives and parses JSON responses
+* Displays lists of headlines or sources
+* Requests and displays detailed information by index
 
 ---
 
