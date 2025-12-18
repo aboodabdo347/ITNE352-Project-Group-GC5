@@ -29,7 +29,7 @@
 
 ---
 
-##  📓 Project Description
+## 📓 Project Description
 
 This project is a **client–server news service system** where:
 
@@ -42,13 +42,13 @@ This project is a **client–server news service system** where:
 
 ## Table of Contents
 
-1. [Group Information](#group-information)
-2. [Semester](#semester)
+1. [Group Information](#👥-group-information)
+2. [Semester](#📅-semester)
 3. [Project Title](#project-title)
-4. [Project Description](#project-description)
-5. [File Structure](#file-structure)
+4. [Project Description](#📓-project-description)
+5. [File Structure](#📂-file-structure)
 6. [Requirements (Setup)](#requirements-setup)
-7. [How to Run](#how-to-run)
+7. [How to Run](#▶️-how-to-run)
 8. [How to Use the Client Menus](#how-to-use-the-client-menus)
 9. [Protocol (Client ↔ Server Messages)](#protocol-client--server-messages)
 10. [Scripts Description](#scripts-description)
