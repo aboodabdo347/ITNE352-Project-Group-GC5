@@ -248,7 +248,7 @@ The server receives **JSON messages** ended by a newline `\n` (it reads until `\
 
 ## client.py
 
-> Not finished yet.
+Implements the required menus, sends JSON requests to the server, displays list results, and fetches details by index.
 
 ---
 
