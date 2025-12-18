@@ -1,9 +1,12 @@
 """" Server Application Done By Abdulrahaman Abdo - GC5"""
 import json
+import socket
+import threading
 import requests
 import os # for accessing environment variables
 from dotenv import load_dotenv # for loading environment variables that contain the API key
 from datetime import datetime  # for logging timestamps
+
 
 # Load environment variables
 load_dotenv()
@@ -104,3 +107,206 @@ class ParameterValidator:   # Validates client request parameters against allowe
             validated["language"] = language
         
         return validated, None
+class ClientConnectionHandler(threading.Thread):
+    # Manages individual client connection in separate thread 
+    
+    def __init__(self, server_instance, client_sock, client_addr):
+        super().__init__(daemon=True)
+        self.server = server_instance
+        self.socket = client_sock
+        self.address = client_addr
+        self.receive_buffer = b""
+        self.username = None
+        self.cached_headlines = []
+        self.cached_sources = []
+    
+    def run(self):
+        # Main thread execution method 
+        try:
+            self._setup_connection()
+            self._process_client_requests()
+        except Exception as error:
+            self._log(f"Error handling client: {error}")
+        finally:
+            self.socket.close()
+            if self.username:
+                self._log(f"Client {self.username} disconnected")
+    
+    def _setup_connection(self):
+        # Initialize client connection and receive username 
+        username_data = self.socket.recv(1024).decode().strip()
+        self.username = username_data if username_data else "Guest"
+        self._log(f"Client connected: {self.username} from {self.address}")
+    
+    def _process_client_requests(self):
+        # Main request processing loop
+        while True:
+            request_data = self._receive_message()
+            if not request_data:
+                break
+            
+            action_type = request_data.get("action")
+            action_params = request_data.get("params", {})
+            
+            if action_type == "quit":
+                self._send_message({"status": "ok", "message": "Connection closed"})
+                break
+            
+            self._log(f"Request from {self.username}: {action_type} with params {action_params}")
+            response_data = self._handle_action(action_type, action_params)
+            self._send_message(response_data)
+    
+    def _handle_action(self, action_type, action_params):
+        # Route action to appropriate handler 
+        try:
+            if action_type.startswith("headlines_"):
+                return self._process_headline_action(action_type, action_params)
+            elif action_type.startswith("sources_"):
+                return self._process_source_action(action_type, action_params)
+            else:
+                return {"status": "error", "message": "Unknown action type"}
+        except Exception as error:
+            return {"status": "error", "message": str(error)}
+    
+    def _process_headline_action(self, action_type, action_params):
+        # Handle headline-related actions 
+        if action_type == "headlines_detail":
+            return self._get_headline_detail(action_params)
+        
+        # Validate parameters
+        validated_params, error_msg = ParameterValidator.validate_headline_params(action_params)
+        if error_msg:
+            return {"status": "error", "message": error_msg}
+        
+        # Fetch data from API
+        api_data = self.server.data_fetcher.get_headlines(validated_params)
+        self._save_response_to_file(action_type, api_data)
+        
+        # Process and cache results
+        articles = api_data.get("articles", [])[:MAX_RESULTS]
+        self.cached_headlines = articles
+        
+        # Build response list
+        response_items = []
+        for idx, article in enumerate(articles, 1):
+            response_items.append({
+                "index": idx,
+                "source": article.get("source", {}).get("name"),
+                "author": article.get("author"),
+                "title": article.get("title")
+            })
+        
+        return {
+            "status": "ok",
+            "type": "headlines_list",
+            "items": response_items,
+            "total": len(articles)
+        }
+    
+    def _get_headline_detail(self, params):
+        # Retrieve detailed information for specific headline 
+        try:
+            index = int(params.get("index", 0))
+        except ValueError:
+            return {"status": "error", "message": "Invalid index format"}
+        
+        if index < 1 or index > len(self.cached_headlines):
+            return {"status": "error", "message": "Index out of range"}
+        
+        article = self.cached_headlines[index - 1]
+        return {
+            "status": "ok",
+            "type": "headline_detail",
+            "detail": {
+                "source": article.get("source", {}).get("name"),
+                "author": article.get("author"),
+                "title": article.get("title"),
+                "url": article.get("url"),
+                "description": article.get("description"),
+                "publishedAt": article.get("publishedAt")
+            }
+        }
+    
+    def _process_source_action(self, action_type, action_params):
+        # Handle source-related actions 
+        if action_type == "sources_detail":
+            return self._get_source_detail(action_params)
+        
+        # Validate parameters
+        validated_params, error_msg = ParameterValidator.validate_source_params(action_params)
+        if error_msg:
+            return {"status": "error", "message": error_msg}
+        
+        # Fetch data from API
+        api_data = self.server.data_fetcher.get_news_sources(validated_params)
+        self._save_response_to_file(action_type, api_data)
+        
+        # Process and cache results
+        sources = api_data.get("sources", [])[:MAX_RESULTS]
+        self.cached_sources = sources
+        
+        # Build response list
+        response_items = []
+        for idx, source in enumerate(sources, 1):
+            response_items.append({
+                "index": idx,
+                "name": source.get("name")
+            })
+        
+        return {
+            "status": "ok",
+            "type": "sources_list",
+            "items": response_items,
+            "total": len(sources)
+        }
+    
+    def _get_source_detail(self, params):
+        try:
+            index = int(params.get("index", 0))
+        except ValueError:
+            return {"status": "error", "message": "Invalid index format"}
+        
+        if index < 1 or index > len(self.cached_sources):
+            return {"status": "error", "message": "Index out of range"}
+        
+        source = self.cached_sources[index - 1]
+        return {
+            "status": "ok",
+            "type": "source_detail",
+            "detail": {
+                "name": source.get("name"),
+                "country": source.get("country"),
+                "description": source.get("description"),
+                "url": source.get("url"),
+                "category": source.get("category"),
+                "language": source.get("language")
+            }
+        }
+    
+    def _save_response_to_file(self, action_name, data):
+        sanitized_action = action_name.replace(" ", "_")
+        filename = f"{self.username}_{sanitized_action}_{GROUP_IDENTIFIER}.json"
+        
+        with open(filename, "w", encoding="utf-8") as file:
+            json.dump(data, file, indent=4)
+    
+    def _receive_message(self):
+        while b"\n" not in self.receive_buffer:
+            chunk = self.socket.recv(BUFFER_SIZE)
+            if not chunk:
+                return None
+            self.receive_buffer += chunk
+        
+        message_data, self.receive_buffer = self.receive_buffer.split(b"\n", 1)
+        try:
+            return json.loads(message_data.decode())
+        except json.JSONDecodeError:
+            return None
+    
+    def _send_message(self, data):
+        message = json.dumps(data) + "\n"
+        self.socket.sendall(message.encode())
+    
+    def _log(self, message):
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[{timestamp}] {message}")
