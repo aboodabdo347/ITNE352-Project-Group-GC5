@@ -42,13 +42,13 @@ This project is a **client–server news service system** where:
 
 ## Table of Contents
 
-1. [Group Information](#👥-group-information)
-2. [Semester](#📅-semester)
+1. [Group Information](#-group-information)
+2. [Semester](#-semester)
 3. [Project Title](#project-title)
-4. [Project Description](#📓-project-description)
-5. [File Structure](#📂-file-structure)
+4. [Project Description](#-project-description)
+5. [File Structure](#-file-structure)
 6. [Requirements (Setup)](#requirements-setup)
-7. [How to Run](#▶️-how-to-run)
+7. [How to Run](#-how-to-run)
 8. [How to Use the Client Menus](#how-to-use-the-client-menus)
 9. [Protocol (Client ↔ Server Messages)](#protocol-client--server-messages)
 10. [Scripts Description](#scripts-description)
@@ -248,7 +248,26 @@ The server receives **JSON messages** ended by a newline `\n` (it reads until `\
 
 ## client.py
 
-> Not finished yet.
+**Purpose:**  
+Implements the required menus, sends JSON requests to the server, displays list results, and fetches details by index.
+
+### Used packages
+
+* `socket`
+* `json`
+
+### Main functionality
+
+* Establishes a TCP connection with the server
+* Sends the client username to the server on connection
+* Displays three interactive menus:
+  * Main Menu
+  * Headlines Menu
+  * Sources Menu
+* Sends user requests to the server using JSON messages
+* Receives and parses JSON responses
+* Displays lists of headlines or sources
+* Requests and displays detailed information by index
 
 ---
 
