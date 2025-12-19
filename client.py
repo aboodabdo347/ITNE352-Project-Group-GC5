@@ -88,11 +88,11 @@ def main():
                         send_request(sock, "headlines_keyword", {"q": q})
 
                     elif h_choice == "2":
-                        cat = input("Category: ")
+                        cat = input("Category: {business, general, health, science, sports, technology}\n")
                         send_request(sock, "headlines_category", {"category": cat})
 
                     elif h_choice == "3":
-                        c = input("Country code: ")
+                        c = input("Country code: {au, ca, jp, ae, sa, kr, us, ma}\n")
                         send_request(sock, "headlines_country", {"country": c})
 
                     elif h_choice == "4":
@@ -118,15 +118,15 @@ def main():
                     s_choice = show_sources_menu()
 
                     if s_choice == "1":
-                        cat = input("Category: ")
+                        cat = input("Category: {business, general, health, science, sports, technology}\n")
                         send_request(sock, "sources_category", {"category": cat})
 
                     elif s_choice == "2":
-                        c = input("Country code: ")
+                        c = input("Country code: {au, ca, jp, ae, sa, kr, us, ma}\n")
                         send_request(sock, "sources_country", {"country": c})
 
                     elif s_choice == "3":
-                        lang = input("Language: ")
+                        lang = input("Language: {ar, en} \n")
                         send_request(sock, "sources_language", {"language": lang})
 
                     elif s_choice == "4":
