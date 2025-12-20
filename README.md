@@ -279,9 +279,10 @@ Implements the required menus, sends JSON requests to the server, displays list 
 
 ---
 
-## Acknowledgments
+## Acknowledgments 
 
-> Not finished yet.
+NewsAPI key used to fetch data for free : [https://newsapi.org/](https://newsapi.org/)
+
 ---
 
 ## Conclusion
